@@ -91,4 +91,3 @@
   community.general.ufw:
     state: enabled
     policy: deny
-
