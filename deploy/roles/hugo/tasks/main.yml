@@ -1,4 +1,4 @@
-# ── 1. 环境检查与强一致性安装 (确保编译引擎可靠) ──────────────────────────────
+# ── 1. 环境检查与强一致性安装 (支持 x86_64 与 ARM64 架构) ──────────────────────────
 - name: Check if Hugo is installed and version matches
   tags: [hugo, check]
   ansible.builtin.shell: hugo version | grep "v0.146.0"
@@ -10,21 +10,27 @@
   tags: [hugo, check]
   when: hugo_check.failed
   block:
+    - name: Set Hugo architecture suffix
+      ansible.builtin.set_fact:
+        hugo_arch: "{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}"
+
     - name: Download Hugo [0.146.0]
       ansible.builtin.get_url:
-        url: "https://github.com/gohugoio/hugo/releases/download/v0.146.0/hugo_extended_0.146.0_linux-amd64.tar.gz"
-        dest: "/tmp/hugo_0.146.0.tar.gz"
+        # 修改下载路径，使其包含架构名，避免缓存冲突
+        url: "https://github.com/gohugoio/hugo/releases/download/v0.146.0/hugo_extended_0.146.0_linux-{{ hugo_arch }}.tar.gz"
+        dest: "/tmp/hugo_0.146.0_{{ hugo_arch }}.tar.gz"
         mode: "0644"
+        force: true # 确保重新下载
+
     - name: Extract and Overwrite binary
       ansible.builtin.unarchive:
-        src: "/tmp/hugo_0.146.0.tar.gz"
+        src: "/tmp/hugo_0.146.0_{{ hugo_arch }}.tar.gz"
         dest: "{{ hugo_path | dirname }}"
         remote_src: true
         include: ["hugo"]
         owner: root
         group: root
         mode: "0755"
-
 # ── 2. 主题与目录结构初始化 (解决模板语法冲突) ───────────────────────────────
 - name: Initialize Hugo project skeleton
   tags: [hugo, deploy]
@@ -53,15 +59,15 @@
     - "config.yaml"
     - "config.json"
 
-# ── 3. 基础设施准备 (对齐 Nginx 物理路径逻辑与权限) ──────────────────────────
+# ── 3. 基础设施准备 (对齐 Ubuntu www-data 用户权限) ──────────────────────────
 - name: Create Web root and Sentinel subdirectory
   tags: [hugo, deploy]
   ansible.builtin.file:
     path: "{{ web_base }}/{{ domain }}{% if sentinel_prefix %}/{{ sentinel_prefix }}{% endif %}"
     state: directory
     mode: "0755"
-    owner: nginx
-    group: nginx
+    owner: www-data
+    group: www-data
 
 - name: Create Archive subdirectories for Nginx routing
   tags: [hugo, deploy]
@@ -69,8 +75,8 @@
     path: "{{ web_base }}/{{ domain }}{% if sentinel_prefix %}/{{ sentinel_prefix }}{% endif %}/{{ item }}"
     state: directory
     mode: "0755"
-    owner: nginx
-    group: nginx
+    owner: www-data
+    group: www-data
   loop:
     - "reports"
     - "news"
@@ -83,7 +89,6 @@
     dest: "{{ sentinel_path }}/hugo/hugo.toml"
     mode: "0644"
 
-# ── 4. 关键文件部署  ──────────────────────────────────
 - name: Copy project layouts, content and static assets
   tags: [hugo, deploy]
   ansible.builtin.copy:
@@ -95,7 +100,6 @@
     - {src: "{{ playbook_dir }}/../hugo/layouts/", dest: "{{ sentinel_path }}/hugo/layouts/"}
     - {src: "{{ playbook_dir }}/../hugo/content/", dest: "{{ sentinel_path }}/hugo/content/"}
     - {src: "{{ playbook_dir }}/../hugo/static/", dest: "{{ sentinel_path }}/hugo/static/"}
-
 
 # ── 5. 生产环境构建 (使用脚本封装解决重定向双斜杠偏移问题) ────────
 - name: Deploy Hugo build wrapper script
@@ -123,6 +127,6 @@
     path: "{{ web_base }}/{{ domain }}{% if sentinel_prefix %}/{{ sentinel_prefix }}{% endif %}"
     state: directory
     recurse: true
-    owner: nginx
-    group: nginx
+    owner: www-data
+    group: www-data
     mode: "0755"

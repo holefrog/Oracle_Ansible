@@ -61,6 +61,7 @@
 
 - name: Enable Certbot automatic renewal timer
   ansible.builtin.systemd:
-    name: certbot-renew.timer
+    # 修改服务名为 Ubuntu 标准的 certbot.timer
+    name: certbot.timer
     enabled: true
     state: started
