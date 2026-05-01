@@ -105,6 +105,15 @@
           - "which ufw => {{ ufw_command_v.stdout | default('') }}"
           - "stat results => {{ ufw_stats.results | map(attribute='stat') | list }}"
 
+- name: Reinstall ufw if executable is missing (agent safety net)
+  tags: [check, firewall]
+  ansible.builtin.apt:
+    name: ufw
+    state: latest
+    update_cache: true
+    force_apt_get: true
+  when: ufw_stats.results | map(attribute='stat.exists') | select('equalto', true) | list | length == 0
+
 - name: Allow HTTP, HTTPS and SSH traffic
   tags: [check, firewall]
   community.general.ufw:
