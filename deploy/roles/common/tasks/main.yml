@@ -50,22 +50,23 @@
         line: "/swapfile none swap sw 0 0"
         state: present
 
-- name: Install Python 3.9 runtime environment
+- name: Install Python 3 runtime environment
   tags: [check]
-  ansible.builtin.dnf:
-    name: [python39, python39-pip]
+  ansible.builtin.apt:
+    name: [python3, python3-pip]
     state: present
+    update_cache: true
 
 - name: Install basic maintenance tools
   tags: [check]
-  ansible.builtin.dnf:
-    name: [git, rsync, cronie]
+  ansible.builtin.apt:
+    name: [git, rsync, cron]
     state: present
 
-- name: Ensure crond service is running
+- name: Ensure cron service is running
   tags: [check]
   ansible.builtin.systemd:
-    name: crond
+    name: cron
     enabled: true
     state: started
 
