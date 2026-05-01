@@ -58,10 +58,10 @@
   notify: Restart bot
 
 # ── 4. 环境与服务 ────────────────────────────────────────────────────────────
-- name: Create Python 3.9 virtual environment
+- name: Create Python virtual environment
   tags: [deploy]
   ansible.builtin.command:
-    cmd: python3.9 -m venv {{ sentinel_path }}/venv
+    cmd: python3 -m venv {{ sentinel_path }}/venv
     creates: "{{ sentinel_path }}/venv/bin/activate"
 
 - name: Install dependencies from requirements.txt
