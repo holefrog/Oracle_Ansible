@@ -1,0 +1,13 @@
+---
+- name: Create Python virtual environment
+  tags: [deploy]
+  ansible.builtin.command:
+    cmd: python3 -m venv {{ sentinel_path }}/venv
+    creates: "{{ sentinel_path }}/venv/bin/activate"
+
+- name: Install dependencies from requirements.txt
+  tags: [deploy]
+  ansible.builtin.pip:
+    requirements: "{{ sentinel_path }}/agent/requirements.txt"
+    virtualenv: "{{ sentinel_path }}/venv"
+    extra_args: "--upgrade pip"
