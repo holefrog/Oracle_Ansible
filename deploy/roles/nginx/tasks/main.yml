@@ -10,8 +10,8 @@
   ansible.builtin.file:
     path: /var/www/certbot
     state: directory
-    owner: nginx
-    group: nginx
+    owner: www-data
+    group: www-data
     mode: '0755'
 
 # ── 2. 检查 SSL 证书是否存在 ──────────────────────────────────
