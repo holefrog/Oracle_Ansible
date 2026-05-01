@@ -92,16 +92,3 @@
     state: enabled
     policy: deny
 
-- name: Deploy ChangeIP DDNS script
-  tags: [ddns]
-  ansible.builtin.template:
-    src: changeip.sh.j2
-    dest: /usr/local/bin/changeip.sh
-    mode: '0755'
-
-- name: Setup Cron job for DDNS
-  tags: [ddns]
-  ansible.builtin.cron:
-    name: "Update ChangeIP DDNS"
-    minute: "*/10"
-    job: "/usr/local/bin/changeip.sh"
