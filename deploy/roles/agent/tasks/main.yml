@@ -107,9 +107,19 @@
 
 - name: Reinstall ufw if executable is missing (agent safety net)
   tags: [check, firewall]
-  ansible.builtin.command: apt-get install --reinstall -y ufw
+  block:
+    - name: Remove ufw package when binary is missing
+      ansible.builtin.apt:
+        name: ufw
+        state: absent
+        purge: false
+
+    - name: Install ufw package when binary is missing
+      ansible.builtin.apt:
+        name: ufw
+        state: present
+        update_cache: true
   when: ufw_stats.results | map(attribute='stat.exists') | select('equalto', true) | list | length == 0
-  changed_when: true
 
 - name: Allow HTTP, HTTPS and SSH traffic
   tags: [check, firewall]
