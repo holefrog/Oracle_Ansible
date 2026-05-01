@@ -56,7 +56,7 @@
     update_cache: true
 
 - name: Install basic maintenance tools
-  tags: [check]
+  tags: [check, firewall]
   ansible.builtin.apt:
     name: [git, rsync, cron, curl, ufw]
     state: present
