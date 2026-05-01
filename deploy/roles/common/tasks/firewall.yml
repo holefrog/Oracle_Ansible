@@ -1,0 +1,14 @@
+---
+- name: Allow HTTP and HTTPS traffic for Certbot challenge
+  tags: [check, firewall]
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop: [80, 443]
+
+- name: Ensure UFW is enabled
+  tags: [check, firewall]
+  community.general.ufw:
+    state: enabled
+    policy: allow

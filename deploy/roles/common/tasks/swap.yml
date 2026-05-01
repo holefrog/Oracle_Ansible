@@ -1,0 +1,35 @@
+---
+- name: Configure 1GB Swap partition if not exists
+  tags: [check, swap]
+  block:
+    - name: Check if system has Swap enabled
+      ansible.builtin.command: swapon --show=SIZE --noheadings
+      register: swap_check
+      changed_when: false
+
+    - name: Create swap file /swapfile
+      ansible.builtin.command: fallocate -l 1G /swapfile
+      when: swap_check.stdout == ""
+      changed_when: true
+
+    - name: Set swap file permissions
+      ansible.builtin.file:
+        path: /swapfile
+        mode: "0600"
+      when: swap_check.stdout == ""
+
+    - name: Format as swap partition
+      ansible.builtin.command: mkswap /swapfile
+      when: swap_check.stdout == ""
+      changed_when: true
+
+    - name: Enable swap partition immediately
+      ansible.builtin.command: swapon /swapfile
+      when: swap_check.stdout == ""
+      changed_when: true
+
+    - name: Persist Swap configuration in fstab
+      ansible.builtin.lineinfile:
+        path: /etc/fstab
+        line: "/swapfile none swap sw 0 0"
+        state: present

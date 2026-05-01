@@ -1,0 +1,20 @@
+---
+- name: Update apt cache and install Python 3 runtime
+  tags: [check]
+  ansible.builtin.apt:
+    name: [python3, python3-pip]
+    state: present
+    update_cache: true
+
+- name: Install basic maintenance tools
+  tags: [check, firewall]
+  ansible.builtin.apt:
+    name: [git, rsync, cron, curl, ufw]
+    state: present
+
+- name: Ensure cron service is running (Ubuntu name is 'cron')
+  tags: [check]
+  ansible.builtin.systemd:
+    name: cron
+    enabled: true
+    state: started
