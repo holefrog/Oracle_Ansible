@@ -58,7 +58,7 @@
 - name: Install basic maintenance tools
   tags: [check]
   ansible.builtin.apt:
-    name: [git, rsync, cron, curl, ufw, iptables-persistent]
+    name: [git, rsync, cron, curl, ufw]
     state: present
 
 - name: Ensure cron service is running
@@ -76,50 +76,7 @@
     iptables -P INPUT ACCEPT
     iptables -P FORWARD ACCEPT
     iptables -P OUTPUT ACCEPT
-    netfilter-persistent save
   changed_when: true
-
-- name: Diagnose ufw executable presence and permissions
-  tags: [check, firewall]
-  block:
-    - name: Check common ufw paths
-      ansible.builtin.stat:
-        path: "{{ item }}"
-      loop:
-        - /usr/sbin/ufw
-        - /usr/bin/ufw
-        - /sbin/ufw
-        - /bin/ufw
-      register: ufw_stats
-      changed_when: false
-
-    - name: Resolve ufw in PATH (command -v)
-      ansible.builtin.command: which ufw
-      register: ufw_command_v
-      changed_when: false
-      failed_when: false
-
-    - name: Show ufw diagnostics
-      ansible.builtin.debug:
-        msg:
-          - "which ufw => {{ ufw_command_v.stdout | default('') }}"
-          - "stat results => {{ ufw_stats.results | map(attribute='stat') | list }}"
-
-- name: Reinstall ufw if executable is missing (agent safety net)
-  tags: [check, firewall]
-  block:
-    - name: Remove ufw package when binary is missing
-      ansible.builtin.apt:
-        name: ufw
-        state: absent
-        purge: false
-
-    - name: Install ufw package when binary is missing
-      ansible.builtin.apt:
-        name: ufw
-        state: present
-        update_cache: true
-  when: ufw_stats.results | map(attribute='stat.exists') | select('equalto', true) | list | length == 0
 
 - name: Allow HTTP, HTTPS and SSH traffic
   tags: [check, firewall]

@@ -1,6 +1,12 @@
 ---
 # common/tasks/main.yml — VPS 环境初始化（Ubuntu 兼容版）
 
+- name: Update apt cache and upgrade installed packages
+  tags: [check]
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: "yes"
+
 - name: Print VPS basic runtime information
   tags: [check, always]
   block:
@@ -60,22 +66,6 @@
   ansible.builtin.apt:
     name: [git, rsync, cron, curl, ufw]
     state: present
-
-- name: Verify ufw executable exists
-  tags: [check, firewall]
-  ansible.builtin.stat:
-    path: /usr/sbin/ufw
-  register: ufw_exec
-  changed_when: false
-
-- name: Reinstall ufw if executable is missing
-  tags: [check, firewall]
-  ansible.builtin.shell: |
-    set -euo pipefail
-    apt-get update -y
-    apt-get install --reinstall -y ufw
-  when: not ufw_exec.stat.exists
-  changed_when: true
 
 - name: Ensure cron service is running (Ubuntu name is 'cron')
   tags: [check]
