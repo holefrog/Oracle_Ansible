@@ -12,7 +12,7 @@
     domain: "myoracle.dynamic-dns.net"
     web_base: "/usr/share/nginx"
     service_name: "stock-sentinel-bot"
-    sentinel_path: "/root/stock-sentinel"
+    sentinel_path: "/opt/stock-sentinel"
     sentinel_prefix: ""
     hugo_path: "/usr/local/bin/hugo"
 
