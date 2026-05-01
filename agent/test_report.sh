@@ -1,7 +1,7 @@
 #!/bin/bash
 # report_test.sh v1.0
 
-APP_DIR="/root/stock-sentinel"
+APP_DIR="/opt/stock-sentinel"
 TEST_CHANNEL="1490212708795023470"
 
 # 1. 加载并验证环境

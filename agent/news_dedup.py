@@ -16,7 +16,7 @@ def init_db(db_path: str):
                 CREATE TABLE IF NOT EXISTS news_registry (
                     guid TEXT PRIMARY KEY,
                     url TEXT,
-                    ai_engine TEXT，
+                    ai_engine TEXT,
                     score INTEGER,
                     reason TEXT,
                     has_brief INTEGER,

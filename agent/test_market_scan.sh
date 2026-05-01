@@ -1,7 +1,7 @@
 #!/bin/bash
 # market_test.sh - Stock-Sentinel 市场异动扫描测试脚本
 
-APP_DIR="/root/stock-sentinel"
+APP_DIR="/opt/stock-sentinel"
 VENV_PYTHON="$APP_DIR/venv/bin/python"
 
 # 1. 环境准备与变量加载

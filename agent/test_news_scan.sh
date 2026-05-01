@@ -1,7 +1,7 @@
 #!/bin/bash
 # news_test.sh v8.7
 
-APP_DIR="/root/stock-sentinel"
+APP_DIR="/opt/stock-sentinel"
 DB_PATH="$APP_DIR/data/sentinel.db"
 
 # 1. 加载并验证环境
@@ -18,7 +18,7 @@ if [ -f "$DB_PATH" ]; then
     echo "🧹 正在清理数据库最新 10 条记录以绕过去重逻辑..."
     # 同时清理登记表和正文表
     # 【修复点】将 guid = (SELECT ...) 改为 guid IN (SELECT ...)
-    sqlite3 "$DB_PATH" "DELETE FROM news_registry WHERE guid IN (SELECT guid FROM news_registry ORDER BY created_at DESC LIMIT 10);"
+    sqlite3 "$DB_PATH" "DELETE FROM news_registry WHERE guid IN (SELECT guid FROM news_registry ORDER BY created_at DESC LIMIT 1);"
     sqlite3 "$DB_PATH" "DELETE FROM news_briefs WHERE guid NOT IN (SELECT guid FROM news_registry);"
     echo "✅ 清理完成。"
 else
@@ -38,8 +38,8 @@ ${HUGO_PATH:-/usr/local/bin/hugo} --gc --cleanDestinationDir \
     --destination "/usr/share/nginx/${SENTINEL_DOMAIN}/sentinel"
 
 # 4. 修正权限
-chown -R nginx:nginx /usr/share/nginx/${SENTINEL_DOMAIN}/sentinel
-chmod -R 755 /usr/share/nginx/${SENTINEL_DOMAIN}/sentinel
+# chown -R nginx:nginx /usr/share/nginx/${SENTINEL_DOMAIN}/sentinel
+# chmod -R 755 /usr/share/nginx/${SENTINEL_DOMAIN}/sentinel
 
 echo "📂 Nginx 目录新闻列表 (前 5 个):"
 ls -lt /usr/share/nginx/${SENTINEL_DOMAIN}/sentinel/news/ | head -n 5
