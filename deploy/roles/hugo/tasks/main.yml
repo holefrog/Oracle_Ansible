@@ -4,7 +4,8 @@
   ansible.builtin.command:
     cmd: "{{ hugo_path }} new site {{ sentinel_path }}/hugo --force"
     creates: "{{ sentinel_path }}/hugo/hugo.toml"
-  become: true  # 确保这里使用的是小写的 true
+  become: true
+  become_user: ubuntu  # 修正：由 ubuntu 创建源码目录
 
 - name: Force Sync PaperMod Theme (Master Branch)
   tags: [hugo, deploy]
@@ -15,15 +16,17 @@
     depth: 1
     update: true
     force: true
-    # 移除 owner 和 group，git 模块不支持这些参数
   become: true
+  become_user: ubuntu  # 修正：不再直接在 git 模块内写 owner，而是切换执行用户
 
-- name: Ensure PaperMod theme ownership
+- name: Remove competing Hugo config files (yaml/json)
   tags: [hugo, deploy]
   ansible.builtin.file:
-    path: "{{ sentinel_path }}/hugo/themes/PaperMod"
-    state: directory
-    owner: ubuntu
-    group: ubuntu
-    recurse: true
+    path: "{{ sentinel_path }}/hugo/{{ item }}"
+    state: absent
   become: true
+  loop:
+    - "hugo.yaml"
+    - "hugo.json"
+    - "config.yaml"
+    - "config.json"
