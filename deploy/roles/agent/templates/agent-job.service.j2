@@ -1,0 +1,10 @@
+[Unit]
+Description={{ item.description }}
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory={{ sentinel_path }}
+ExecStart=/bin/bash -lc '{{ item.command }}'

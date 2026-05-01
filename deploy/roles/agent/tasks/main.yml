@@ -98,54 +98,85 @@
     daemon_reload: true
 
 # ── Nginx 统一配置已全权交由 nginx role 处理 ──
-# ── 6. 调度任务 (集成 Hugo 编译动作) ──────────────────────────────────────────
-- name: Setup scheduled report tasks
+# ── 6. 调度任务 (systemd timers) ─────────────────────────────────────────────
+- name: Remove legacy cron schedules
   tags: [deploy]
   ansible.builtin.cron:
-    name: "Stock-sentinel {{ item.type }} report"
-    hour: "{{ item.time.split(':')[0] | int }}"
-    minute: "{{ item.time.split(':')[1] | int }}"
-    job: >
-      set -a; . {{ sentinel_path }}/.env; set +a;
-      PYTHONPATH={{ sentinel_path }} {{ sentinel_path }}/venv/bin/python -m agent.report
-      --type {{ item.type }} --channel {{ report_ch }}
-      >> {{ sentinel_path }}/logs/{{ item.type }}.log 2>&1;
-      {{ sentinel_path }}/hugo/build_hugo.sh >> {{ sentinel_path }}/logs/hugo.log 2>&1
+    name: "{{ item }}"
+    state: absent
   loop:
-    - { type: 'morning', time: "{{ morning_time }}" }
-    - { type: 'evening', time: "{{ evening_time }}" }
+    - "Stock-sentinel morning report"
+    - "Stock-sentinel evening report"
+    - "Stock-sentinel news scanner (Multi-channel)"
+    - "Stock-sentinel market scan"
+    - "Stock-sentinel heartbeat"
 
-- name: Setup multi-channel news scanner cron task
+- name: Deploy scheduled job service units
   tags: [deploy]
-  ansible.builtin.cron:
-    name: "Stock-sentinel news scanner (Multi-channel)"
-    minute: "*/{{ news_scan_minutes }}"
-    job: >
-      set -a; . {{ sentinel_path }}/.env; set +a;
-      PYTHONPATH={{ sentinel_path }} {{ sentinel_path }}/venv/bin/python -m agent.news_scanner
-      --channel {{ alert_ch }} >> {{ sentinel_path }}/logs/scan.log 2>&1;
-      {{ sentinel_path }}/hugo/build_hugo.sh >> {{ sentinel_path }}/logs/hugo.log 2>&1
+  ansible.builtin.template:
+    src: agent-job.service.j2
+    dest: "/etc/systemd/system/{{ item.name }}.service"
+    mode: "0644"
+  loop:
+    - name: stock-sentinel-morning-report
+      description: "StockSentinel morning report job"
+      command: "set -a; . {{ sentinel_path }}/.env; set +a; PYTHONPATH={{ sentinel_path }} {{ sentinel_path }}/venv/bin/python -m agent.report --type morning --channel {{ report_ch }} >> {{ sentinel_path }}/logs/morning.log 2>&1; {{ sentinel_path }}/hugo/build_hugo.sh >> {{ sentinel_path }}/logs/hugo.log 2>&1"
+    - name: stock-sentinel-evening-report
+      description: "StockSentinel evening report job"
+      command: "set -a; . {{ sentinel_path }}/.env; set +a; PYTHONPATH={{ sentinel_path }} {{ sentinel_path }}/venv/bin/python -m agent.report --type evening --channel {{ report_ch }} >> {{ sentinel_path }}/logs/evening.log 2>&1; {{ sentinel_path }}/hugo/build_hugo.sh >> {{ sentinel_path }}/logs/hugo.log 2>&1"
+    - name: stock-sentinel-news-scan
+      description: "StockSentinel news scanner job"
+      command: "set -a; . {{ sentinel_path }}/.env; set +a; PYTHONPATH={{ sentinel_path }} {{ sentinel_path }}/venv/bin/python -m agent.news_scanner --channel {{ alert_ch }} >> {{ sentinel_path }}/logs/scan.log 2>&1; {{ sentinel_path }}/hugo/build_hugo.sh >> {{ sentinel_path }}/logs/hugo.log 2>&1"
+    - name: stock-sentinel-market-scan
+      description: "StockSentinel market scanner job"
+      command: "set -a; . {{ sentinel_path }}/.env; set +a; PYTHONPATH={{ sentinel_path }} {{ sentinel_path }}/venv/bin/python -m agent.market_scan --channel {{ scan_ch }} >> {{ sentinel_path }}/logs/scan.log 2>&1"
+    - name: stock-sentinel-heartbeat
+      description: "StockSentinel heartbeat job"
+      command: "set -a; . {{ sentinel_path }}/.env; set +a; PYTHONPATH={{ sentinel_path }} {{ sentinel_path }}/venv/bin/python -m agent.heartbeat --channel {{ log_ch }} >> {{ sentinel_path }}/logs/heartbeat.log 2>&1"
 
-- name: Setup market scan cron task
+- name: Deploy scheduled job timer units
   tags: [deploy]
-  ansible.builtin.cron:
-    name: "Stock-sentinel market scan"
-    minute: "*/{{ market_scan_minutes }}"
-    job: >
-      set -a; . {{ sentinel_path }}/.env; set +a;
-      PYTHONPATH={{ sentinel_path }} {{ sentinel_path }}/venv/bin/python -m agent.market_scan
-      --channel {{ scan_ch }} >> {{ sentinel_path }}/logs/scan.log 2>&1
+  ansible.builtin.template:
+    src: agent-job.timer.j2
+    dest: "/etc/systemd/system/{{ item.name }}.timer"
+    mode: "0644"
+  loop:
+    - name: stock-sentinel-morning-report
+      description: "StockSentinel morning report timer"
+      on_calendar: "{{ morning_time }}:00"
+      timezone: "{{ cron_tz }}"
+    - name: stock-sentinel-evening-report
+      description: "StockSentinel evening report timer"
+      on_calendar: "{{ evening_time }}:00"
+      timezone: "{{ cron_tz }}"
+    - name: stock-sentinel-news-scan
+      description: "StockSentinel news scanner timer"
+      on_unit_active_sec: "{{ news_scan_minutes }}m"
+    - name: stock-sentinel-market-scan
+      description: "StockSentinel market scanner timer"
+      on_unit_active_sec: "{{ market_scan_minutes }}m"
+    - name: stock-sentinel-heartbeat
+      description: "StockSentinel heartbeat timer"
+      on_calendar: "{{ heartbeat_time }}:00"
+      timezone: "{{ cron_tz }}"
 
-- name: Setup heartbeat cron task
+- name: Reload systemd daemon for scheduled jobs
   tags: [deploy]
-  ansible.builtin.cron:
-    name: "Stock-sentinel heartbeat"
-    hour: "{{ heartbeat_time.split(':')[0] | int }}"
-    minute: "{{ heartbeat_time.split(':')[1] | int }}"
-    job: >
-      set -a; . {{ sentinel_path }}/.env; set +a;
-      PYTHONPATH={{ sentinel_path }} {{ sentinel_path }}/venv/bin/python -m agent.heartbeat
-      --channel {{ log_ch }} >> {{ sentinel_path }}/logs/heartbeat.log 2>&1
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Ensure scheduled job timers are enabled and running
+  tags: [deploy]
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - stock-sentinel-morning-report.timer
+    - stock-sentinel-evening-report.timer
+    - stock-sentinel-news-scan.timer
+    - stock-sentinel-market-scan.timer
+    - stock-sentinel-heartbeat.timer
 
 # ── 7. 状态确认 ──────────────────────────────────────────────────────────────
 - name: Verify service health
