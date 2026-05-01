@@ -94,16 +94,15 @@
       changed_when: false
 
     - name: Resolve ufw in PATH (command -v)
-      ansible.builtin.shell: |
-        set -euo pipefail
-        command -v ufw || true
+      ansible.builtin.command: which ufw
       register: ufw_command_v
       changed_when: false
+      failed_when: false
 
     - name: Show ufw diagnostics
       ansible.builtin.debug:
         msg:
-          - "command -v ufw => {{ ufw_command_v.stdout | default('') }}"
+          - "which ufw => {{ ufw_command_v.stdout | default('') }}"
           - "stat results => {{ ufw_stats.results | map(attribute='stat') | list }}"
 
 - name: Allow HTTP, HTTPS and SSH traffic
