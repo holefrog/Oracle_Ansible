@@ -79,6 +79,33 @@
     netfilter-persistent save
   changed_when: true
 
+- name: Diagnose ufw executable presence and permissions
+  tags: [check, firewall]
+  block:
+    - name: Check common ufw paths
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      loop:
+        - /usr/sbin/ufw
+        - /usr/bin/ufw
+        - /sbin/ufw
+        - /bin/ufw
+      register: ufw_stats
+      changed_when: false
+
+    - name: Resolve ufw in PATH (command -v)
+      ansible.builtin.shell: |
+        set -euo pipefail
+        command -v ufw || true
+      register: ufw_command_v
+      changed_when: false
+
+    - name: Show ufw diagnostics
+      ansible.builtin.debug:
+        msg:
+          - "command -v ufw => {{ ufw_command_v.stdout | default('') }}"
+          - "stat results => {{ ufw_stats.results | map(attribute='stat') | list }}"
+
 - name: Allow HTTP, HTTPS and SSH traffic
   tags: [check, firewall]
   community.general.ufw:
