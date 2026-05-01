@@ -1,10 +1,9 @@
+---
 - name: Generate .env configuration
   tags: [deploy, secrets]
   ansible.builtin.template:
     src: env.j2
     dest: "{{ sentinel_path }}/.env"
-    owner: ubuntu      # 明确指定所有者
-    group: ubuntu      # 明确指定所属组
     mode: "0600"
   notify: Restart bot
 
@@ -13,10 +12,7 @@
   ansible.builtin.template:
     src: bot.service.j2
     dest: "/etc/systemd/system/{{ service_name }}.service"
-    owner: root        # Systemd 服务文件推荐属于 root
-    group: root
     mode: "0644"
-  become: true          # 这个任务写入 /etc，必须提权
   notify:
     - Reload systemd
     - Restart bot
@@ -28,4 +24,3 @@
     enabled: true
     state: started
     daemon_reload: true
-  become: true          # 管理 Systemd 服务必须提权

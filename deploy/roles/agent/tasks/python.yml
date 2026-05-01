@@ -1,10 +1,9 @@
+---
 - name: Create Python virtual environment
   tags: [deploy]
   ansible.builtin.command:
     cmd: python3 -m venv {{ sentinel_path }}/venv
     creates: "{{ sentinel_path }}/venv/bin/activate"
-  become: true
-  become_user: ubuntu  # 关键：让 ubuntu 亲手创建自己的环境
 
 - name: Install dependencies from requirements.txt
   tags: [deploy]
@@ -12,5 +11,3 @@
     requirements: "{{ sentinel_path }}/agent/requirements.txt"
     virtualenv: "{{ sentinel_path }}/venv"
     extra_args: "--upgrade pip"
-  become: true
-  become_user: ubuntu  # 关键：确保安装的库文件也归 ubuntu 所有

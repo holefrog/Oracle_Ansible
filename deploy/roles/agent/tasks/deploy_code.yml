@@ -1,27 +1,13 @@
-- name: Create project directory structure (Restricted)
+---
+- name: Create project directory structure
   tags: [deploy]
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: ubuntu
-    group: ubuntu
-    mode: "0700"  # 仅 ubuntu 用户有权进入和查看
-  become: true    # 如果 sentinel_path 在 /opt 下，必须提权创建
+    mode: "0755"
   loop:
-    - "{{ sentinel_path }}"
     - "{{ sentinel_path }}/agent"
     - "{{ sentinel_path }}/config"
-
-- name: Create Web root directory (Public readable)
-  tags: [deploy]
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    owner: ubuntu
-    group: ubuntu
-    mode: "0755"  # Nginx 需要读取权限来提供服务
-  become: true
-  loop:
     - "{{ web_root }}"
     - "{{ web_root }}/{{ sentinel_prefix }}"
 
@@ -30,21 +16,15 @@
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/../agent/"
     dest: "{{ sentinel_path }}/agent/"
-    owner: ubuntu
-    group: ubuntu
-    mode: "0600"  # 源代码设为仅所有者可读
-  become: true
+    mode: "0644"
   notify: Restart bot
 
-- name: Sync configuration TOML files (Strict Secrets)
+- name: Sync configuration TOML files (Except hugo.toml)
   tags: [deploy, secrets]
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/../config/{{ item }}"
     dest: "{{ sentinel_path }}/config/{{ item }}"
-    owner: ubuntu
-    group: ubuntu
-    mode: "0600"  # 配置文件（含 Key）必须是 0600
-  become: true
+    mode: "0644"
   loop:
     - "watch_list.toml"
     - "settings.toml"
