@@ -1,14 +1,4 @@
 ---
-- name: Create sentinel base directory (root, then hand off)
-  tags: [hugo, deploy]
-  ansible.builtin.file:
-    path: "{{ sentinel_path }}"
-    state: directory
-    owner: "{{ sentinel_user }}"
-    group: "{{ sentinel_user }}"
-    mode: "0755"
-  become: true
-
 - name: Create Hugo site directory
   tags: [hugo, deploy]
   ansible.builtin.file:

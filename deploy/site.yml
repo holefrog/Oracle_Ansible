@@ -19,10 +19,10 @@
     sentinel_group: "sentinel"
 
   roles:
-    - role: common
+    - role: infrastructure
     - role: nginx
-    - role: hugo
     - role: agent
+    - role: hugo
 
   pre_tasks:
     - name: Use Python native TOML parser on localhost

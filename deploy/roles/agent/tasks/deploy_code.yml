@@ -5,18 +5,18 @@
     src: "{{ playbook_dir }}/../agent/"
     dest: "{{ sentinel_path }}/agent/"
     mode: "0644"
-   owner: "{{ sentinel_user }}"
-   group: "{{ sentinel_user }}"
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
   notify: Restart bot
-    
+
 - name: Sync configuration TOML files (Except hugo.toml)
   tags: [deploy, secrets]
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/../config/{{ item }}"
     dest: "{{ sentinel_path }}/config/{{ item }}"
     mode: "0644"
-   owner: "{{ sentinel_user }}"
-   group: "{{ sentinel_user }}"
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
   loop:
     - "watch_list.toml"
     - "settings.toml"
