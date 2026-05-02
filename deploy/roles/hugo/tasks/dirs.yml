@@ -1,4 +1,36 @@
 ---
-- name: Skip Hugo directory creation because it is handled by the structure role
-  ansible.builtin.debug:
-    msg: "Hugo directory creation is delegated to deploy/roles/structure"
+- name: Create Hugo application directory
+  tags: [hugo, deploy]
+  ansible.builtin.file:
+    path: "{{ sentinel_path }}/hugo"
+    state: directory
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
+    mode: "0755"
+  become: true
+
+- name: Create Hugo content and layout subdirectories
+  tags: [hugo, deploy]
+  ansible.builtin.file:
+    path: "{{ sentinel_path }}/hugo/{{ item }}"
+    state: directory
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
+    mode: "0755"
+  loop:
+    - content/news/archives
+    - content/reports/archives
+    - layouts/_default
+    - static/css
+  become: true
+  become_user: "{{ sentinel_user }}"
+
+- name: Create Hugo webroot directory
+  tags: [hugo, deploy]
+  ansible.builtin.file:
+    path: "{{ web_base }}/{{ domain }}{% if sentinel_prefix %}/{{ sentinel_prefix }}{% endif %}"
+    state: directory
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
+    mode: "0755"
+  become: true

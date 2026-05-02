@@ -20,7 +20,6 @@
 
   roles:
     - role: infrastructure
-    - role: structure
     - role: nginx
     - role: agent
     - role: hugo

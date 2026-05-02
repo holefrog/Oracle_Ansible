@@ -1,3 +1,33 @@
+- name: Create agent application directory
+  tags: [deploy]
+  ansible.builtin.file:
+    path: "{{ sentinel_path }}/agent"
+    state: directory
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
+    mode: "0755"
+  become: true
+
+- name: Create agent config directory
+  tags: [deploy]
+  ansible.builtin.file:
+    path: "{{ sentinel_path }}/config"
+    state: directory
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
+    mode: "0755"
+  become: true
+
+- name: Create agent logs directory
+  tags: [deploy]
+  ansible.builtin.file:
+    path: "{{ sentinel_path }}/logs"
+    state: directory
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
+    mode: "0755"
+  become: true
+
 - name: Create Python virtual environment and install dependencies
   tags: [deploy]
   ansible.builtin.pip:
