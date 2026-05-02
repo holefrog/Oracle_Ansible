@@ -38,7 +38,7 @@
 - name: Create webroot directory for Hugo output
   tags: [hugo, deploy]
   ansible.builtin.file:
-    path: "{{ web_base }}/{{ domain }}/{{ sentinel_prefix }}"
+    path: "{{ web_base }}/{{ domain }}{% if sentinel_prefix %}/{{ sentinel_prefix }}{% endif %}"
     state: directory
     owner: "{{ sentinel_user }}"
     group: "{{ sentinel_user }}"

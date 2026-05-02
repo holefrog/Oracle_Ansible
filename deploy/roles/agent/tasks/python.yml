@@ -1,13 +1,19 @@
----
-- name: Create Python virtual environment
+- name: Ensure sentinel_path ownership is correct
   tags: [deploy]
-  ansible.builtin.command:
-    cmd: python3 -m venv {{ sentinel_path }}/venv
-    creates: "{{ sentinel_path }}/venv/bin/activate"
+  ansible.builtin.file:
+    path: "{{ sentinel_path }}"
+    state: directory
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
+    recurse: yes
+  become: true
 
-- name: Install dependencies from requirements.txt
+- name: Create Python virtual environment and install dependencies
   tags: [deploy]
   ansible.builtin.pip:
     requirements: "{{ sentinel_path }}/agent/requirements.txt"
     virtualenv: "{{ sentinel_path }}/venv"
+    virtualenv_command: python3 -m venv
     extra_args: "--upgrade pip"
+  become: true
+  become_user: "{{ sentinel_user }}"
