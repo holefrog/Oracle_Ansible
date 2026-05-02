@@ -1,5 +1,7 @@
 ---
 # agent/tasks/main.yml
+- name: Create sentinel service user
+  ansible.builtin.import_tasks: user.yml
 
 - name: Load agent variables
   ansible.builtin.import_tasks: vars.yml

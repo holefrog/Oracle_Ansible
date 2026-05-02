@@ -1,0 +1,44 @@
+---
+- name: Deploy Hugo site config (rendered template)
+  tags: [hugo, deploy]
+  ansible.builtin.template:
+    src: hugo.toml.j2
+    dest: "{{ sentinel_path }}/hugo/hugo.toml"
+    owner: ubuntu
+    group: ubuntu
+    mode: "0644"
+  become: true
+  become_user: ubuntu
+
+- name: Deploy layouts
+  tags: [hugo, deploy]
+  ansible.builtin.copy:
+    src: layouts/
+    dest: "{{ sentinel_path }}/hugo/layouts/"
+    owner: ubuntu
+    group: ubuntu
+    mode: "0644"
+  become: true
+  become_user: ubuntu
+
+- name: Deploy static assets
+  tags: [hugo, deploy]
+  ansible.builtin.copy:
+    src: static/
+    dest: "{{ sentinel_path }}/hugo/static/"
+    owner: ubuntu
+    group: ubuntu
+    mode: "0644"
+  become: true
+  become_user: ubuntu
+
+- name: Deploy content skeleton
+  tags: [hugo, deploy]
+  ansible.builtin.copy:
+    src: content/
+    dest: "{{ sentinel_path }}/hugo/content/"
+    owner: ubuntu
+    group: ubuntu
+    mode: "0644"
+  become: true
+  become_user: ubuntu

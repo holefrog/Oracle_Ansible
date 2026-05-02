@@ -1,42 +1,15 @@
-# ── 第一步：由 root 圈地并授权 ──────────────────────────────
-- name: Create project base directory as root
-  tags: [hugo, deploy]
-  ansible.builtin.file:
-    path: "{{ sentinel_path }}"
-    state: directory
-    owner: ubuntu
-    group: ubuntu
-    mode: "0755"  # 允许 Nginx 读取，但只有 ubuntu 能写
-  become: true    # 必须用 root 身份在 /opt 下创建第一层目录
+---
+# hugo/tasks/main.yml
+# v2 - 拆分为功能子文件
 
-# ── 第二步：由 ubuntu 身份执行 Hugo 初始化 ─────────────────────
-- name: Initialize Hugo project skeleton
-  tags: [hugo, deploy]
-  ansible.builtin.command:
-    cmd: "{{ hugo_path }} new site {{ sentinel_path }}/hugo --force"
-    creates: "{{ sentinel_path }}/hugo/hugo.toml"
-  become: true
-  become_user: ubuntu  # 现在父目录已归 ubuntu 所有，此操作将成功
+- name: Create Hugo directories
+  ansible.builtin.import_tasks: dirs.yml
 
-- name: Force Sync PaperMod Theme
-  tags: [hugo, deploy]
-  ansible.builtin.git:
-    repo: https://github.com/adityatelange/hugo-PaperMod
-    dest: "{{ sentinel_path }}/hugo/themes/PaperMod"
-    version: "master"
-    depth: 1
-    update: true
-    force: true
-  become: true
-  become_user: ubuntu
+- name: Install Hugo theme
+  ansible.builtin.import_tasks: theme.yml
 
-# ── 第三步：清理 root 遗留（防御性编程） ───────────────────────
-- name: Final ownership sweep
-  tags: [hugo, deploy]
-  ansible.builtin.file:
-    path: "{{ sentinel_path }}"
-    state: directory
-    owner: ubuntu
-    group: ubuntu
-    recurse: true
-  become: true
+- name: Deploy Hugo site skeleton
+  ansible.builtin.import_tasks: site.yml
+
+- name: Deploy Hugo build script
+  ansible.builtin.import_tasks: build.yml

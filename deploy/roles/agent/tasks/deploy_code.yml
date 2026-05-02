@@ -8,8 +8,6 @@
   loop:
     - "{{ sentinel_path }}/agent"
     - "{{ sentinel_path }}/config"
-    - "{{ web_root }}"
-    - "{{ web_root }}/{{ sentinel_prefix }}"
 
 - name: Upload Agent source code
   tags: [deploy]

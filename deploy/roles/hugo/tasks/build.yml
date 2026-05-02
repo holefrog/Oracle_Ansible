@@ -1,0 +1,34 @@
+---
+- name: Deploy Hugo build wrapper script
+  tags: [hugo, deploy]
+  ansible.builtin.template:
+    src: build_hugo.sh.j2
+    dest: "{{ sentinel_path }}/hugo/build_hugo.sh"
+    owner: ubuntu
+    group: ubuntu
+    mode: "0755"
+  become: true
+  become_user: ubuntu
+
+- name: Verify Hugo binary is executable
+  tags: [hugo, deploy]
+  ansible.builtin.command:
+    cmd: "{{ hugo_path }} version"
+  register: hugo_ver
+  changed_when: false
+  failed_when: hugo_ver.rc != 0
+
+- name: Print Hugo version
+  tags: [hugo, deploy]
+  ansible.builtin.debug:
+    msg: "{{ hugo_ver.stdout }}"
+
+- name: Final ownership sweep
+  tags: [hugo, deploy]
+  ansible.builtin.file:
+    path: "{{ sentinel_path }}"
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    recurse: true
+  become: true

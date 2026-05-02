@@ -1,0 +1,14 @@
+---
+# hugo/tasks/theme.yml
+
+- name: Force sync PaperMod theme
+  tags: [hugo, deploy]
+  ansible.builtin.git:
+    repo: https://github.com/adityatelange/hugo-PaperMod
+    dest: "{{ sentinel_path }}/hugo/themes/PaperMod"
+    version: "master"
+    depth: 1
+    update: true
+    force: true
+  become: true
+  become_user: ubuntu
