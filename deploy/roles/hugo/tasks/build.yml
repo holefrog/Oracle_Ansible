@@ -22,13 +22,3 @@
   tags: [hugo, deploy]
   ansible.builtin.debug:
     msg: "{{ hugo_ver.stdout }}"
-
-- name: Final ownership sweep
-  tags: [hugo, deploy]
-  ansible.builtin.file:
-    path: "{{ sentinel_path }}"
-    state: directory
-    owner: "{{ sentinel_user }}"
-    group: "{{ sentinel_user }}"
-    recurse: true
-  become: true
