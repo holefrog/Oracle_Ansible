@@ -1,6 +1,4 @@
 ---
-# hugo/tasks/theme.yml
-
 - name: Force sync PaperMod theme
   tags: [hugo, deploy]
   ansible.builtin.git:
@@ -11,4 +9,4 @@
     update: true
     force: true
   become: true
-  become_user: ubuntu
+  become_user: "{{ sentinel_user }}"

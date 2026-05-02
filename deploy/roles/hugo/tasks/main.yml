@@ -1,7 +1,4 @@
 ---
-# hugo/tasks/main.yml
-# v2 - 拆分为功能子文件
-
 - name: Create Hugo directories
   ansible.builtin.import_tasks: dirs.yml
 

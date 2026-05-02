@@ -4,11 +4,11 @@
   ansible.builtin.template:
     src: build_hugo.sh.j2
     dest: "{{ sentinel_path }}/hugo/build_hugo.sh"
-    owner: ubuntu
-    group: ubuntu
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
     mode: "0755"
   become: true
-  become_user: ubuntu
+  become_user: "{{ sentinel_user }}"
 
 - name: Verify Hugo binary is executable
   tags: [hugo, deploy]
@@ -28,7 +28,7 @@
   ansible.builtin.file:
     path: "{{ sentinel_path }}"
     state: directory
-    owner: ubuntu
-    group: ubuntu
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
     recurse: true
   become: true

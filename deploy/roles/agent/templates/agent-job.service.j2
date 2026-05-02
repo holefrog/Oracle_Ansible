@@ -4,9 +4,8 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-User=ubuntu
-Group=ubuntu
 Type=oneshot
-User=root
+User={{ sentinel_user }}
+Group={{ sentinel_user }}
 WorkingDirectory={{ sentinel_path }}
 ExecStart=/bin/bash -lc '{{ item.command }}'

@@ -4,8 +4,8 @@
   ansible.builtin.file:
     path: "{{ sentinel_path }}"
     state: directory
-    owner: ubuntu
-    group: ubuntu
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
     mode: "0755"
   become: true
 
@@ -14,8 +14,8 @@
   ansible.builtin.file:
     path: "{{ sentinel_path }}/hugo"
     state: directory
-    owner: ubuntu
-    group: ubuntu
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
     mode: "0755"
   become: true
 
@@ -24,8 +24,8 @@
   ansible.builtin.file:
     path: "{{ sentinel_path }}/hugo/{{ item }}"
     state: directory
-    owner: ubuntu
-    group: ubuntu
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
     mode: "0755"
   loop:
     - content/news/archives
@@ -33,14 +33,14 @@
     - layouts/_default
     - static/css
   become: true
-  become_user: ubuntu
+  become_user: "{{ sentinel_user }}"
 
 - name: Create webroot directory for Hugo output
   tags: [hugo, deploy]
   ansible.builtin.file:
     path: "{{ web_base }}/{{ domain }}/{{ sentinel_prefix }}"
     state: directory
-    owner: ubuntu
-    group: ubuntu
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
     mode: "0755"
   become: true
