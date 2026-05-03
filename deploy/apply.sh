@@ -36,11 +36,19 @@ esac
 echo ">>> 已选择: ${MODE}"
 echo ""
 
+# 检查是否开启 verbose
+VERBOSE=""
+read -rp "是否开启详细输出 verbose？[y/N]: " v
+if [[ "$v" =~ ^[Yy]$ ]]; then
+    VERBOSE="-v"
+fi
+echo ""
+
 # 检查密钥
 if [[ ! -f "$KEY" ]]; then
     echo "❌ 未找到 ${KEY}"
-    [[ "$MODE" == "bootstrap" ]] && echo "请先将 远程主机提供的 ubuntu 用户的私钥名称改名为 ubuntu.key"
-    [[ "$MODE" == "apply" ]] && echo "请先执行 bootstrap"
+    [[ "$MODE" == "bootstrap" ]] && echo "💡 请先将 ssh-key-2026-04-30.key 改名为 ubuntu.key 放入 deploy/ 目录"
+    [[ "$MODE" == "apply" ]] && echo "💡 sentinel.key 由 bootstrap 阶段自动生成，请先选择 1) Bootstrap 完成初始化"
     exit 1
 fi
 chmod 400 "$KEY"
@@ -53,13 +61,13 @@ if ! ansible-playbook -i "$INV" "$PB" --syntax-check >/dev/null; then
 fi
 echo "✅ 语法正常"
 
-# 连接测试
-echo ">>> [2/2] 正在测试主机连通性..."
-if ! ansible all -i "$INV" -m ping >/dev/null; then
-    echo "❌ 无法连接到服务器"
+# 语法检查
+echo ">>> [1/2] 正在执行语法校验..."
+if ! ansible-playbook -i "$INV" "$PB" --syntax-check >/dev/null 2>&1; then
+    echo "❌ 语法错误"
     exit 1
 fi
-echo "✅ 连接成功"
+echo "✅ 语法正常"
 
 echo "--------------------------------------------------------"
 echo "🛠️  正在执行 ${MODE}..."
@@ -71,7 +79,7 @@ if [[ "$MODE" == "bootstrap" ]]; then
     echo ""
 fi
 
-ansible-playbook -i "$INV" "$PB" $BECOME_ARGS "$@"
+ansible-playbook -i "$INV" "$PB" $BECOME_ARGS $VERBOSE "$@"
 
 echo ""
 echo "🎉 ${MODE} 完成！"

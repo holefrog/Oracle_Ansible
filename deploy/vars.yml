@@ -10,5 +10,5 @@ service_name: "stock-sentinel-bot"
 # ── 应用用户 ────────────────────────────────────────────────
 app_user_name: "sentinel"
 app_user_home: "/opt/stock-sentinel"
-app_user_shell: "/usr/sbin/nologin"
+app_user_shell: "/bin/bash"
 app_user_key_path: "{{ playbook_dir }}/sentinel.key"
