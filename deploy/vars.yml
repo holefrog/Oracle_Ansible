@@ -12,6 +12,3 @@ app_user_name: "sentinel"
 app_user_home: "/opt/stock-sentinel"
 app_user_shell: "/usr/sbin/nologin"
 app_user_key_path: "{{ playbook_dir }}/sentinel.key"
-app_user_sudoers:
-  - /usr/bin/systemctl
-  - "/usr/bin/tee /etc/systemd/system/*"
