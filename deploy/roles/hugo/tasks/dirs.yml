@@ -2,20 +2,20 @@
 - name: Create Hugo application directory
   tags: [hugo, deploy]
   ansible.builtin.file:
-    path: "{{ sentinel_path }}/hugo"
+    path: "{{ app_user_home }}/hugo"
     state: directory
-    owner: "{{ sentinel_user }}"
-    group: "{{ sentinel_user }}"
+    owner: "{{ app_user_name }}"
+    group: "{{ app_user_name }}"
     mode: "0755"
   become: true
 
 - name: Create Hugo content and layout subdirectories
   tags: [hugo, deploy]
   ansible.builtin.file:
-    path: "{{ sentinel_path }}/hugo/{{ item }}"
+    path: "{{ app_user_home }}/hugo/{{ item }}"
     state: directory
-    owner: "{{ sentinel_user }}"
-    group: "{{ sentinel_user }}"
+    owner: "{{ app_user_name }}"
+    group: "{{ app_user_name }}"
     mode: "0755"
   loop:
     - content/news/archives
@@ -23,14 +23,14 @@
     - layouts/_default
     - static/css
   become: true
-  become_user: "{{ sentinel_user }}"
+  become_user: "{{ app_user_name }}"
 
 - name: Create Hugo webroot directory
   tags: [hugo, deploy]
   ansible.builtin.file:
     path: "{{ web_base }}/{{ domain }}{% if sentinel_prefix %}/{{ sentinel_prefix }}{% endif %}"
     state: directory
-    owner: "{{ sentinel_user }}"
-    group: "{{ sentinel_user }}"
+    owner: "{{ app_user_name }}"
+    group: "{{ app_user_name }}"
     mode: "0755"
   become: true

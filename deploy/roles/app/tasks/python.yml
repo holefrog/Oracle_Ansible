@@ -1,59 +1,59 @@
 - name: Create agent application directory
   tags: [deploy]
   ansible.builtin.file:
-    path: "{{ sentinel_path }}/agent"
+    path: "{{ app_user_home }}/agent"
     state: directory
-    owner: "{{ sentinel_user }}"
-    group: "{{ sentinel_user }}"
+    owner: "{{ app_user_name }}"
+    group: "{{ app_user_name }}"
     mode: "0755"
   become: true
 
 - name: Create agent config directory
   tags: [deploy]
   ansible.builtin.file:
-    path: "{{ sentinel_path }}/config"
+    path: "{{ app_user_home }}/config"
     state: directory
-    owner: "{{ sentinel_user }}"
-    group: "{{ sentinel_user }}"
+    owner: "{{ app_user_name }}"
+    group: "{{ app_user_name }}"
     mode: "0755"
   become: true
 
 - name: Create agent logs directory
   tags: [deploy]
   ansible.builtin.file:
-    path: "{{ sentinel_path }}/logs"
+    path: "{{ app_user_home }}/logs"
     state: directory
-    owner: "{{ sentinel_user }}"
-    group: "{{ sentinel_user }}"
+    owner: "{{ app_user_name }}"
+    group: "{{ app_user_name }}"
     mode: "0755"
   become: true
 
 - name: Create data directory as sentinel user
   tags: [deploy]
   ansible.builtin.file:
-    path: "{{ sentinel_path }}/data"
+    path: "{{ app_user_home }}/data"
     state: directory
-    owner: "{{ sentinel_user }}"
-    group: "{{ sentinel_user }}"
+    owner: "{{ app_user_name }}"
+    group: "{{ app_user_name }}"
     mode: "0755"
   become: true
 
 - name: Create Python virtual environment and install dependencies
   tags: [deploy]
   ansible.builtin.pip:
-    requirements: "{{ sentinel_path }}/agent/requirements.txt"
-    virtualenv: "{{ sentinel_path }}/venv"
+    requirements: "{{ app_user_home }}/agent/requirements.txt"
+    virtualenv: "{{ app_user_home }}/venv"
     virtualenv_command: python3 -m venv
     extra_args: "--upgrade pip"
   become: true
-  become_user: "{{ sentinel_user }}"
+  become_user: "{{ app_user_name }}"
 
 - name: Fix venv directory ownership
   tags: [deploy]
   ansible.builtin.file:
-    path: "{{ sentinel_path }}/venv"
+    path: "{{ app_user_home }}/venv"
     state: directory
-    owner: "{{ sentinel_user }}"
-    group: "{{ sentinel_user }}"
+    owner: "{{ app_user_name }}"
+    group: "{{ app_user_name }}"
     recurse: true
   become: true

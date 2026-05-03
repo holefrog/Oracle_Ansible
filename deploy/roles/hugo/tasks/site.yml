@@ -3,42 +3,42 @@
   tags: [hugo, deploy]
   ansible.builtin.template:
     src: hugo.toml.j2
-    dest: "{{ sentinel_path }}/hugo/hugo.toml"
-    owner: "{{ sentinel_user }}"
-    group: "{{ sentinel_user }}"
+    dest: "{{ app_user_home }}/hugo/hugo.toml"
+    owner: "{{ app_user_name }}"
+    group: "{{ app_user_name }}"
     mode: "0644"
   become: true
-  become_user: "{{ sentinel_user }}"
+  become_user: "{{ app_user_name }}"
 
 - name: Deploy layouts
   tags: [hugo, deploy]
   ansible.builtin.copy:
     src: layouts/
-    dest: "{{ sentinel_path }}/hugo/layouts/"
-    owner: "{{ sentinel_user }}"
-    group: "{{ sentinel_user }}"
+    dest: "{{ app_user_home }}/hugo/layouts/"
+    owner: "{{ app_user_name }}"
+    group: "{{ app_user_name }}"
     mode: "0644"
   become: true
-  become_user: "{{ sentinel_user }}"
+  become_user: "{{ app_user_name }}"
 
 - name: Deploy static assets
   tags: [hugo, deploy]
   ansible.builtin.copy:
     src: static/
-    dest: "{{ sentinel_path }}/hugo/static/"
-    owner: "{{ sentinel_user }}"
-    group: "{{ sentinel_user }}"
+    dest: "{{ app_user_home }}/hugo/static/"
+    owner: "{{ app_user_name }}"
+    group: "{{ app_user_name }}"
     mode: "0644"
   become: true
-  become_user: "{{ sentinel_user }}"
+  become_user: "{{ app_user_name }}"
 
 - name: Deploy content skeleton
   tags: [hugo, deploy]
   ansible.builtin.copy:
     src: content/
-    dest: "{{ sentinel_path }}/hugo/content/"
-    owner: "{{ sentinel_user }}"
-    group: "{{ sentinel_user }}"
+    dest: "{{ app_user_home }}/hugo/content/"
+    owner: "{{ app_user_name }}"
+    group: "{{ app_user_name }}"
     mode: "0644"
   become: true
-  become_user: "{{ sentinel_user }}"
+  become_user: "{{ app_user_name }}"

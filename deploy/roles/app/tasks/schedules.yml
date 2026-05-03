@@ -21,36 +21,36 @@
     - name: stock-sentinel-morning-report
       description: "StockSentinel morning report job"
       command: >-
-        set -a; . {{ sentinel_path }}/.env; set +a;
-        PYTHONPATH={{ sentinel_path }} {{ sentinel_path }}/venv/bin/python -m agent.report
-        --type morning --channel {{ report_ch }} >> {{ sentinel_path }}/logs/morning.log 2>&1;
-        {{ sentinel_path }}/hugo/build_hugo.sh >> {{ sentinel_path }}/logs/hugo.log 2>&1
+        set -a; . {{ app_user_home }}/.env; set +a;
+        PYTHONPATH={{ app_user_home }} {{ app_user_home }}/venv/bin/python -m agent.report
+        --type morning --channel {{ report_ch }} >> {{ app_user_home }}/logs/morning.log 2>&1;
+        {{ app_user_home }}/hugo/build_hugo.sh >> {{ app_user_home }}/logs/hugo.log 2>&1
     - name: stock-sentinel-evening-report
       description: "StockSentinel evening report job"
       command: >-
-        set -a; . {{ sentinel_path }}/.env; set +a;
-        PYTHONPATH={{ sentinel_path }} {{ sentinel_path }}/venv/bin/python -m agent.report
-        --type evening --channel {{ report_ch }} >> {{ sentinel_path }}/logs/evening.log 2>&1;
-        {{ sentinel_path }}/hugo/build_hugo.sh >> {{ sentinel_path }}/logs/hugo.log 2>&1
+        set -a; . {{ app_user_home }}/.env; set +a;
+        PYTHONPATH={{ app_user_home }} {{ app_user_home }}/venv/bin/python -m agent.report
+        --type evening --channel {{ report_ch }} >> {{ app_user_home }}/logs/evening.log 2>&1;
+        {{ app_user_home }}/hugo/build_hugo.sh >> {{ app_user_home }}/logs/hugo.log 2>&1
     - name: stock-sentinel-news-scan
       description: "StockSentinel news scanner job"
       command: >-
-        set -a; . {{ sentinel_path }}/.env; set +a;
-        PYTHONPATH={{ sentinel_path }} {{ sentinel_path }}/venv/bin/python -m agent.news_scanner
-        --channel {{ alert_ch }} >> {{ sentinel_path }}/logs/scan.log 2>&1;
-        {{ sentinel_path }}/hugo/build_hugo.sh >> {{ sentinel_path }}/logs/hugo.log 2>&1
+        set -a; . {{ app_user_home }}/.env; set +a;
+        PYTHONPATH={{ app_user_home }} {{ app_user_home }}/venv/bin/python -m agent.news_scanner
+        --channel {{ alert_ch }} >> {{ app_user_home }}/logs/scan.log 2>&1;
+        {{ app_user_home }}/hugo/build_hugo.sh >> {{ app_user_home }}/logs/hugo.log 2>&1
     - name: stock-sentinel-market-scan
       description: "StockSentinel market scanner job"
       command: >-
-        set -a; . {{ sentinel_path }}/.env; set +a;
-        PYTHONPATH={{ sentinel_path }} {{ sentinel_path }}/venv/bin/python -m agent.market_scan
-        --channel {{ scan_ch }} >> {{ sentinel_path }}/logs/scan.log 2>&1
+        set -a; . {{ app_user_home }}/.env; set +a;
+        PYTHONPATH={{ app_user_home }} {{ app_user_home }}/venv/bin/python -m agent.market_scan
+        --channel {{ scan_ch }} >> {{ app_user_home }}/logs/scan.log 2>&1
     - name: stock-sentinel-heartbeat
       description: "StockSentinel heartbeat job"
       command: >-
-        set -a; . {{ sentinel_path }}/.env; set +a;
-        PYTHONPATH={{ sentinel_path }} {{ sentinel_path }}/venv/bin/python -m agent.heartbeat
-        --channel {{ log_ch }} >> {{ sentinel_path }}/logs/heartbeat.log 2>&1
+        set -a; . {{ app_user_home }}/.env; set +a;
+        PYTHONPATH={{ app_user_home }} {{ app_user_home }}/venv/bin/python -m agent.heartbeat
+        --channel {{ log_ch }} >> {{ app_user_home }}/logs/heartbeat.log 2>&1
 
 - name: Deploy scheduled job timer units
   tags: [deploy]

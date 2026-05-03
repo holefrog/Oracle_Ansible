@@ -1,7 +1,7 @@
 #!/bin/bash
 # ANSIBLE MANAGED: Hugo compilation wrapper
 
-cd "{{ sentinel_path }}/hugo" || exit 1
+cd "{{ app_user_home }}/hugo" || exit 1
 
 {{ hugo_path }} --gc --cleanDestinationDir \
   -b "https://{{ domain }}{% if sentinel_prefix %}/{{ sentinel_prefix }}{% endif %}/" \

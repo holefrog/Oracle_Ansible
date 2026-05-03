@@ -3,12 +3,12 @@
   tags: [hugo, deploy]
   ansible.builtin.template:
     src: build_hugo.sh.j2
-    dest: "{{ sentinel_path }}/hugo/build_hugo.sh"
-    owner: "{{ sentinel_user }}"
-    group: "{{ sentinel_user }}"
+    dest: "{{ app_user_home }}/hugo/build_hugo.sh"
+    owner: "{{ app_user_name }}"
+    group: "{{ app_user_name }}"
     mode: "0755"
   become: true
-  become_user: "{{ sentinel_user }}"
+  become_user: "{{ app_user_name }}"
 
 - name: Verify Hugo binary is executable
   tags: [hugo, deploy]

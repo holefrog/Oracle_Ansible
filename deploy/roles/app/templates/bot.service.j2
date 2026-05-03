@@ -8,11 +8,11 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User={{ sentinel_user }}
-Group={{ sentinel_user }}
-WorkingDirectory={{ sentinel_path }}
-EnvironmentFile={{ sentinel_path }}/.env
-ExecStart={{ sentinel_path }}/venv/bin/python -m agent.bot
+User={{ app_user_name }}
+Group={{ app_user_name }}
+WorkingDirectory={{ app_user_home }}
+EnvironmentFile={{ app_user_home }}/.env
+ExecStart={{ app_user_home }}/venv/bin/python -m agent.bot
 Restart=always
 RestartSec=5
 StandardOutput=journal

@@ -2,19 +2,19 @@
 - name: Create sentinel service account
   tags: [deploy]
   ansible.builtin.user:
-    name: "{{ sentinel_user }}"
+    name: "{{ app_user_name }}"
     system: true
     shell: /usr/sbin/nologin
-    home: "{{ sentinel_path }}"
+    home: "{{ app_user_home }}"
     create_home: false
     state: present
 
-- name: Ensure sentinel_path root is owned by sentinel
+- name: Ensure app_user_home root is owned by sentinel
   tags: [deploy]
   ansible.builtin.file:
-    path: "{{ sentinel_path }}"
+    path: "{{ app_user_home }}"
     state: directory
-    owner: "{{ sentinel_user }}"
-    group: "{{ sentinel_user }}"
+    owner: "{{ app_user_name }}"
+    group: "{{ app_user_name }}"
     mode: "0755"
   become: true
