@@ -1,0 +1,26 @@
+---
+- name: StockSentinel Bootstrap
+  hosts: vps
+  become: true
+  vars_files:
+    - secrets.yml
+    - vars.yml
+
+  pre_tasks:
+    - name: Use Python native TOML parser on localhost
+      tags: [always]
+      ansible.builtin.shell:
+        cmd: "python3 -c 'import tomllib, json; print(json.dumps(tomllib.load(open(\"{{ playbook_dir }}/../config/settings.toml\", \"rb\"))))'"
+      register: toml_output
+      delegate_to: localhost
+      changed_when: false
+
+    - name: Inject business variables from TOML
+      tags: [always]
+      ansible.builtin.set_fact:
+        cfg: "{{ toml_output.stdout | from_json }}"
+
+  roles:
+    - role: infrastructure
+    - role: web
+    - role: app_user

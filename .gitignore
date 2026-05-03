@@ -4,7 +4,9 @@ config/scanner.toml
 deploy/secrets.yml
 deploy/inventory.yml
 deploy/id_vps
-
+deploy/ubuntu.key
+deploy/sentinel.key
+deploy/*.key
 
 # Python
 __pycache__/

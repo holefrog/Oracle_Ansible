@@ -1,6 +1,4 @@
 ---
-# infrastructure/tasks/main.yml — VPS 环境初始化（Ubuntu 兼容版）
-
 - name: Bootstrap system baseline
   ansible.builtin.import_tasks: bootstrap.yml
 

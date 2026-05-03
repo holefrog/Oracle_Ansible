@@ -28,6 +28,16 @@
     mode: "0755"
   become: true
 
+- name: Create data directory as sentinel user
+  tags: [deploy]
+  ansible.builtin.file:
+    path: "{{ sentinel_path }}/data"
+    state: directory
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
+    mode: "0755"
+  become: true
+
 - name: Create Python virtual environment and install dependencies
   tags: [deploy]
   ansible.builtin.pip:
@@ -37,3 +47,13 @@
     extra_args: "--upgrade pip"
   become: true
   become_user: "{{ sentinel_user }}"
+
+- name: Fix venv directory ownership
+  tags: [deploy]
+  ansible.builtin.file:
+    path: "{{ sentinel_path }}/venv"
+    state: directory
+    owner: "{{ sentinel_user }}"
+    group: "{{ sentinel_user }}"
+    recurse: true
+  become: true
